@@ -2,13 +2,17 @@ import java.io.File;
 import java.util.Scanner;
 
 class GS {
-    static int n;
-    static String[] menNames;
-    static String[] womenNames;
-    static int[][] menPref;
-    static int[][] womenPref;
+    int n;
+    String[] menNames;
+    String[] womenNames;
+    int[][] menPref;
+    int[][] womenPref;
 
     public static void main(String[] args) {
+        new GS().run(args);
+    }
+
+    public void run(String[] args) {
         File file = new File(args[0]);
         Scanner scanner = new Scanner(System.in);
         try {
@@ -22,65 +26,45 @@ class GS {
         // printSolution();
     }
 
-    static public void build(Scanner scanner) {
-        while(scanner.hasNext()){
-            String line = scanner.nextLine();
-            System.out.println(line);
+    public void build(Scanner scanner) {
+        String line = scanner.nextLine();
 
-            // skip empty lines
-            if (line.isEmpty()) {
-                continue;
-            }
+        // skip comments.
+        while (line.charAt(0) == '#') {
+            line = scanner.nextLine();
+        }
 
-            char firstChar = line.charAt(0);
-            switch (firstChar) {
-                case '#':
-                    System.out.println("REMOVED COMMENT!");
-                    break;
-                case 'n':
-                    n = Character.getNumericValue(firstChar);
-                    System.out.println("n set to " + n);
-                    menNames = new String[n];
-                    womenNames = new String[n];
-                    menPref = new int[n][n];
-                    womenPref = new int[n][n];
-                    break;
-                default:
-                    char secondChar = line.charAt(1);
-                    if (secondChar == ' ') {
-                        processName(line, firstChar);
-                    } else {
-                        processPreferences(line, firstChar);
-                    }
-                    break;
+        n = Integer.parseInt(line.split("=")[1]);
+        menNames = new String[n];
+        womenNames = new String[n];
+        menPref = new int[n][n];
+        womenPref = new int[n][n];
+
+        System.out.println("N = " + n);
+
+        for (int i = 0; i < 2 * n; i++) {
+            line = scanner.nextLine();
+            if (i % 2 == 1) {
+                menNames[(i-1) / 2] = line.split(" ")[1];
+            } else {
+                womenNames[(i-1) / 2] = line.split(" ")[1];
             }
         }
-    }
+        line = scanner.nextLine();
 
-    public static void processPreferences(String line, char firstChar) {
-        int index = Character.getNumericValue(firstChar);
-        String[] tokens = line.substring(3, line.length()).split(" ");
-        int[] preferences = new int[tokens.length];
-        for (int i = 0; i < tokens.length; i++) {
-            preferences[i] = Integer.parseInt(tokens[i]);
-        }
-        if (index % 2 == 0) {
-            womenPref[(index-1) / 2] = preferences;
-        } else {
-            menPref[(index-1) / 2] = preferences;
-        }
-        System.out.println("Added preferences: " + line);
+        for (int i = 0; i < 2 * n; i++) {
+            line = scanner.nextLine();
+            String[] tokens = line.split(":")[1].substring(1).split(" ");
+            int[] preferences = new int[n];
+            for (int j = 0; j < tokens.length; j++) {
+                preferences[j] = Integer.parseInt(tokens[j]);
+            }
 
-    }
-
-    public static void processName(String line, char firstChar) {
-        int index = Character.getNumericValue(firstChar);
-        String name = line.substring(2, line.length());
-        if (index % 2 == 0) {
-            womenNames[(index-1) / 2] = name;
-        } else {
-            menNames[(index-1) / 2] = name;
+            if (i % 2 == 1) {
+                menPref[(i-1) / 2] = preferences;
+            } else {
+                womenPref[(i-1) / 2] = preferences;
+            }
         }
-        System.out.println("Added " + name + " at " + index);
     }
 }
